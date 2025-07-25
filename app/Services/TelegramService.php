@@ -28,7 +28,7 @@ class TelegramService
                 'message_length' => strlen($text)
             ]);
 
-            $response = Http::withoutVerifying() // Disable SSL verification
+            $response = Http::withoutVerifying() 
                 ->timeout(30)
                 ->post("{$this->baseUrl}/sendMessage", [
                     'chat_id' => $chatId,

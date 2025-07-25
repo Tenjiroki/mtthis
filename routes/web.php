@@ -10,7 +10,6 @@ Route::get('/', function () {
     return ('welcome');
 });
 
-// Original webhook setup route
 Route::get('/setup-webhook', function (App\Services\TelegramService $telegramService) {
     $webhookUrl = url('/api/telegram/webhook');
     $result = $telegramService->setWebhook($webhookUrl);
@@ -18,19 +17,16 @@ Route::get('/setup-webhook', function (App\Services\TelegramService $telegramSer
     return $result ? 'Webhook setup successful!' : 'Webhook setup failed!';
 });
 
-// Debug routes - ADD THESE:
 
-// Check users in database
 Route::get('/check_users', function () {
     $users = User::all();
     return response()->json([
         'total_users' => $users->count(),
-        'subscribed_users' => $users->where('subscription', true)->count(),
+        'subscribed_users' => $users->where('subscribed', true)->count(),
         'users' => $users->toArray()
     ]);
 });
 
-// Test notifications system
 Route::get('/test_notifications', function () {
     $taskService = new TaskService();
     $tasks = $taskService->getIncompleteTasks();
@@ -42,7 +38,6 @@ Route::get('/test_notifications', function () {
 
     $message = $taskService->formatTasksMessage($tasks);
 
-    // Send to all subscribed users
     foreach ($users as $user) {
         SendTelegramNotification::dispatch($user->telegram_id, $message);
     }
@@ -60,12 +55,10 @@ Route::get('/test-all-tasks', function () {
         $response = Http::get('https://jsonplaceholder.typicode.com/todos');
         $allTasks = $response->json();
 
-        // Get all incomplete tasks (no userId filter)
         $allIncomplete = array_filter($allTasks, function ($task) {
             return !$task['completed'];
         });
 
-        // Get incomplete for userId <= 5
         $filteredIncomplete = array_filter($allTasks, function ($task) {
             return !$task['completed'] && $task['userId'] <= 5;
         });
@@ -85,7 +78,6 @@ Route::get('/test-all-tasks', function () {
         return response()->json(['error' => $e->getMessage()]);
     }
 });
-// Test bot token
 Route::get('/test-bot', function () {
     $botToken = env('TELEGRAM_BOT_TOKEN');
     $response = Http::withoutVerifying()
@@ -93,7 +85,6 @@ Route::get('/test-bot', function () {
     return response()->json($response->json());
 });
 
-// Enhanced webhook setup with debug info
 Route::get('/setup-webhook-debug', function () {
     $botToken = env('TELEGRAM_BOT_TOKEN');
     $webhookUrl = url('/api/telegram/webhook');
@@ -114,7 +105,6 @@ Route::get('/setup-webhook-debug', function () {
     ]);
 });
 
-// Check current webhook info
 Route::get('/webhook-info', function () {
     $botToken = env('TELEGRAM_BOT_TOKEN');
     $response = Http::withoutVerifying()
@@ -122,7 +112,6 @@ Route::get('/webhook-info', function () {
     return response()->json($response->json());
 });
 
-// Test fetching tasks from API
 Route::get('/test-tasks', function () {
     $taskService = new TaskService();
     $tasks = $taskService->getIncompleteTasks();
@@ -138,7 +127,6 @@ Route::get('/debug-api', function () {
         $response = Http::get('https://jsonplaceholder.typicode.com/todos');
         $allTasks = $response->json();
 
-        // Show first 10 tasks and filter stats
         $incompleteTasks = array_filter($allTasks, function ($task) {
             return !$task['completed'] && $task['userId'] <= 5;
         });

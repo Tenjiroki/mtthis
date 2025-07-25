@@ -1,66 +1,115 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+Laravel Telegram Bot
+A Laravel-based service that fetches tasks from an external API and sends notifications to subscribed users via Telegram bot.
+Features
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+Telegram Bot Integration: Handle /start, /stop, and /tasks commands
+User Management: Store users with subscription preferences
+Task Notifications: Fetch incomplete tasks and send notifications
+Queue System: Asynchronous message sending using Laravel queues
+Console Commands: Automated task notification system
 
-## About Laravel
+Requirements
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+PHP 8.1+
+Laravel 9-12
+MySQL/PostgreSQL database
+Telegram Bot Token
+Queue driver (database, Redis, etc.)
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+Installation
+1. Clone the Repository
+bashgit clone <your-repository-url>
+cd telegram-task-bot
+2. Install Dependencies
+bashcomposer install
+3. Environment Setup
+bashcp .env.example .env
+php artisan key:generate
+4. Configure Environment Variables
+Edit .env file with your settings:
+env# Database Configuration
+DB_CONNECTION=mysql
+DB_HOST=127.0.0.1
+DB_PORT=3306
+DB_DATABASE=your_database
+DB_USERNAME=your_username
+DB_PASSWORD=your_password
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+# Telegram Bot Configuration
+TELEGRAM_BOT_TOKEN=your_bot_token_here
 
-## Learning Laravel
+# Queue Configuration
+QUEUE_CONNECTION=database
+5. Database Setup
+bashphp artisan migrate
+php artisan db:seed
+6. Set Up Queue Worker
+bashphp artisan queue:work
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+Telegram Bot Setup
+1. Create a Telegram Bot
 
-You may also try the [Laravel Bootcamp](https://bootcamp.laravel.com), where you will be guided through building a modern Laravel application from scratch.
+Message @BotFather on Telegram
+Use /newbot command
+Follow instructions to get your bot token
+Add the token to your .env file
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+2. Set Up Webhook
+Visit the webhook setup route in your browser:
+http://your-domain.com/setup-webhook
+Or use the debug version for more information:
+http://your-domain.com/setup-webhook-debug
 
-## Laravel Sponsors
+Bot Commands
+CommandDescription/startSubscribe to task notifications/stopUnsubscribe from notifications/tasksGet current incomplete tasks
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
+Usage
+Running the Notification Command
+Send notifications to all subscribed users:
+bashphp artisan notify:tasks
+Schedule the Command (Optional)
+Add to app/Console/Kernel.php:
+phpprotected function schedule(Schedule $schedule)
+{
+    $schedule->command('notify:tasks')->hourly();
+}
+Then run the scheduler:
+bashphp artisan schedule:work
 
-### Premium Partners
+Testing
+Run All Tests
+bashphp artisan test
+Run Specific Test Suites
+bash# Unit tests only
+php artisan test --testsuite=Unit
 
-- **[Vehikl](https://vehikl.com/)**
-- **[Tighten Co.](https://tighten.co)**
-- **[WebReinvent](https://webreinvent.com/)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel/)**
-- **[Cyber-Duck](https://cyber-duck.co.uk)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Jump24](https://jump24.co.uk)**
-- **[Redberry](https://redberry.international/laravel/)**
-- **[Active Logic](https://activelogic.com)**
-- **[byte5](https://byte5.de)**
-- **[OP.GG](https://op.gg)**
+# Feature tests only
+php artisan test --testsuite=Feature
 
-## Contributing
+# Specific test file
+php artisan test tests/Feature/TelegramWebhookTest.php
+Test Coverage
+The following components are tested:
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+Task fetching and formatting (TaskServiceTest)
+Telegram webhook handling (TelegramWebhookTest)
+Console command execution (NotifyTasksCommandTest)
 
-## Code of Conduct
+ API Endpoints
+Telegram Webhook
+POST /api/telegram/webhook
+Handles incoming Telegram updates.
+Debug Routes
+Available for testing and debugging:
+RouteDescriptionGET /check_usersView all users in databaseGET /test_notificationsTest notification systemGET /test-tasksTest task fetchingGET /webhook-infoCheck current webhook statusGET /test-botVerify bot token
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
-
-## Security Vulnerabilities
-
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
-
-## License
-
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+Database Schema
+Users Table
+sqlCREATE TABLE users (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    name VARCHAR(255) NOT NULL,
+    telegram_id VARCHAR(255) UNIQUE NOT NULL,
+    subscribed BOOLEAN DEFAULT TRUE,
+    created_at TIMESTAMP,
+    updated_at TIMESTAMP
+);

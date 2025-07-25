@@ -25,7 +25,6 @@ class TelegramController extends Controller
 
             Log::info('Telegram webhook received:', $update);
 
-            // Check if it's a message update
             if (!isset($update['message'])) {
                 Log::info('No message in update, skipping');
                 return response()->json(['status' => 'ok']);
@@ -33,7 +32,6 @@ class TelegramController extends Controller
 
             $message = $update['message'];
 
-            // Validate required fields
             if (!isset($message['chat']['id']) || !isset($message['text'])) {
                 Log::warning('Invalid message format', $message);
                 return response()->json(['status' => 'ok']);
@@ -49,7 +47,6 @@ class TelegramController extends Controller
                 'name' => $firstName,
             ]);
 
-            // Handle commands
             switch ($text) {
                 case '/start':
                     $this->handleStartCommand($chatId, $firstName);
@@ -86,7 +83,7 @@ class TelegramController extends Controller
                 ['telegram_id' => $chatId],
                 [
                     'name' => $name,
-                    'subscription' => true,
+                    'subscribed' => true,
                 ]
             );
 
@@ -118,7 +115,7 @@ class TelegramController extends Controller
             $user = User::where('telegram_id', $chatId)->first();
 
             if ($user) {
-                $user->update(['subscription' => false]);
+                $user->update(['subscribed' => false]);
                 $message = "You've been unsubscribed from notifications. Use /start to resubscribe. 🔕";
             } else {
                 $message = "User not found. Use /start to register first. ❌";

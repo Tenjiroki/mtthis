@@ -12,7 +12,7 @@ return new class extends Migration
             $table->increments('id');
             $table->string('name');
             $table->string('telegram_id')->unique();
-            $table->boolean('subscription')->default(1);
+            $table->boolean('subscribed')->default(1);
             $table->timestamps();
         });
     }

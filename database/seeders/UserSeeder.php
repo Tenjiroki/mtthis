@@ -12,13 +12,13 @@ class UserSeeder extends Seeder
         User::create([
             'name' => 'Hihi',
             'telegram_id' => '177013',
-            'subscription' => true,
+            'subscribed' => true,
         ]);
 
         User::create([
             'name' => 'Haha',
             'telegram_id' => '141015679',
-            'subscription' => false,
+            'subscribed' => false,
         ]);
     }
 }

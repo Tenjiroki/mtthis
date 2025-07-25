@@ -12,15 +12,15 @@ class User extends Model
     protected $fillable = [
         'name',
         'telegram_id',
-        'subscription',
+        'subscribed',
     ];
 
     protected $casts = [
-        'subscription' => 'boolean',
+        'subscribed' => 'boolean',
     ];
 
     public function scopeSubscribed($query)
     {
-        return $query->where('subscription', true);
+        return $query->where('subscribed', true);
     }
 }
